@@ -3,9 +3,7 @@ body {
 }
 
 /* left pane */
-#problist {
-	padding-right: 1em;
-	width: auto;
+#problist { padding-right: 1em; width: auto;
 	max-width: 50%;
 }
 
@@ -41,4 +39,27 @@ body {
 
 .problem:hover {
 	background-color: gray;
+}
+
+/* submission table */
+
+#submissionsListWrapper {
+	max-height: 60vh;
+	overflow-y: scroll;
+}
+
+.execution {
+	padding: 0.2rem;
+	margin: 0.1rem;
+	border-radius: 0.25rem;
+	font-family: monospace;
+	font-size: small;
+}
+
+.execution.bad {
+	background-color: #e0e1e2;
+}
+
+.execution.good {
+	background-color: #21ba45;
 }

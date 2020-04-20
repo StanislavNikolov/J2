@@ -10,10 +10,11 @@ CREATE TABLE problems (
 CREATE TABLE submissions (
 	id INTEGER NOT NULL PRIMARY KEY,
 	problem_id INTEGER NOT NULL,
+	judged BOOLEAN NOT NULL DEFAULT FALSE,
 	date DATE NOT NULL,
+	-- TODO user_key
 	ip TEXT,
 	source_code TEXT NOT NULL,
-	-- TODO ??? source_code_compile_message
 	FOREIGN KEY (problem_id) REFERENCES problems (id)
 );
 
@@ -23,16 +24,16 @@ CREATE TABLE tests (
 	inp_contents TEXT, -- visible to solution and checker
 	out_contents TEXT, -- visible to checker only
 	memory_limit INTEGER NOT NULL, -- in bytes
-	time_limit float NOT NULL, -- in seconds
+	time_limit float NOT NULL, -- in miliseconds
 	FOREIGN KEY (problem_id) REFERENCES problems (id)
 );
 
-CREATE TABLE execution (
+CREATE TABLE executions (
 	id INTEGER NOT NULL PRIMARY KEY,
 	submission_id INTEGER NOT NULL,
 	test_id INTEGER, -- -1 when the execution is of 'prepare' type - compilation, syntax check
 	date DATE NOT NULL,
-	verdict TEXT, -- OK, WA, RE, TL, CC (checker crashed)
+	verdict TEXT, -- OK, WA, RE, ML, TL, CE/CS (compile error/success), CC (checker crashed)
 	message TEXT, -- detailed message from checker
 	FOREIGN KEY (submission_id) REFERENCES submissions (id)
 	FOREIGN KEY (test_id) REFERENCES tests (id)
@@ -42,3 +43,7 @@ CREATE TABLE execution (
 INSERT INTO problems (name, grading_type, user_visible) VALUES ("1) Heap sort",           "ints", true);
 INSERT INTO problems (name, grading_type, user_visible) VALUES ("2) Olimp 2020 A3 sheep", "ints", true);
 INSERT INTO problems (name, grading_type, user_visible) VALUES ("prob 3",                 "ints", false);
+INSERT INTO tests    (problem_id, inp_contents, out_contents, memory_limit, time_limit)
+       VALUES        (1, "3 3 1 2", "1 2 3", 1000000, 1000);
+INSERT INTO tests    (problem_id, inp_contents, out_contents, memory_limit, time_limit)
+       VALUES        (1, "4 3 1 2 9", "1 2 3 9", 1000000, 1000);
