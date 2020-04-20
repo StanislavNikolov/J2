@@ -16,6 +16,36 @@ const markSelected = (el) => {
 
 	selectedProbEl = el;
 	el.classList.add('selected');
+
+	renderSubmissionsTable();
+	showCorrectStatement();
+};
+
+const showCorrectStatement = () => {
+	const probId = Number(selectedProbEl.id.substring(2));
+	const prob = problems.find(x => x.id === probId);
+
+	if(prob.statement_type === 'PDF') {
+		type = 'application/pdf';
+	} else if(prob.statement_type === 'plaintext') {
+		type = 'text/plain';
+	} else if(prob.statement_type === 'plaintext') {
+		type = 'text/html';
+	}
+
+	if(type === 'text/html' || type === 'application/pdf') {
+		document.getElementById('statement').innerHTML = `
+		<object type="${type}" data="/statement/${prob.id}" width=100% height=100%>
+			<p>Statement cannot be displayed :(</p>
+		</object>
+		`;
+	} else {
+		fetch(`/statement/${prob.id}`)
+		.then(resp => resp.text())
+		.then(statement => {
+			document.getElementById('statement').innerHTML = `<div class='pre'>${statement}</div>`;
+		});
+	}
 };
 
 const watchSubmissionForUpdates = (subId, el) => {
@@ -109,7 +139,7 @@ const renderSubmission = (sbm, executions) => {
 	execs.map(x => details.appendChild(renderExecution(x)));
 
 	const date = (new Date(sbm.date)).toISOString().substring(0, 16).replace('T', ' ');
-	const score = sbm.score.toFixed();
+	const score = (sbm.score == null ? 0 : sbm.score.toFixed());
 
 	const dlBtnHTML = `<button class="ui mini compact icon button"><i class="download icon"></i></button>`;
 	el.innerHTML = `<td>${date}</td><td>${score}</td><td>${details.innerHTML}</td><td>${dlBtnHTML}`;

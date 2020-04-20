@@ -10,7 +10,7 @@ app.use(express.static('client/'));
 app.use(express.static('node_modules/semantic-ui-offline/'));
 
 app.get('/problems', (req, res) => {
-	const SQL = `SELECT id, name FROM problems WHERE user_visible = true`;
+	const SQL = `SELECT id, name, statement_type FROM problems WHERE user_visible = true`;
 	db.all(SQL, [], (err, rows) => {
 		if (err) {
 			res.json({error: 'database error'});
@@ -129,6 +129,18 @@ app.post('/submit/:probId', (req, res) => {
 		workers.startGrader(this.lastID);
 
 		res.json({id: this.lastID});
+	});
+});
+
+app.get('/statement/:probId', (req, res) => {
+	const SQL = 'SELECT statement_code FROM problems WHERE id = ?';
+	db.all(SQL, [req.params.probId], (err, rows) => {
+		if(err) {
+			res.send('Database error');
+			console.log('Database error', err);
+			return;
+		}
+		res.send(rows[0].statement_code);
 	});
 });
 

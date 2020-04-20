@@ -3,6 +3,8 @@ CREATE TABLE problems (
 	id INTEGER NOT NULL PRIMARY KEY,
 	name TEXT NOT NULL,
 	checker_code TEXT,
+	statement_code TEXT, -- the bytes/text of the statement file
+	statement_type TEXT DEFAULT 'plaintext', -- PDF, HTML, markdown or plaintext
 	user_visible BOOLEAN NOT NULL -- should be hidden from users if false
 );
 
