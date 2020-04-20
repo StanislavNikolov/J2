@@ -2,7 +2,6 @@
 CREATE TABLE problems (
 	id INTEGER NOT NULL PRIMARY KEY,
 	name TEXT NOT NULL,
-	grading_type TEXT NOT NULL, -- ints, floats, strings, custom_checker
 	checker_code TEXT,
 	user_visible BOOLEAN NOT NULL -- should be hidden from users if false
 );
@@ -25,6 +24,7 @@ CREATE TABLE tests (
 	out_contents TEXT, -- visible to checker only
 	memory_limit INTEGER NOT NULL, -- in bytes
 	time_limit float NOT NULL, -- in miliseconds
+	grading_type TEXT NOT NULL, -- ints, floats, strings, custom_checker
 	FOREIGN KEY (problem_id) REFERENCES problems (id)
 );
 
@@ -36,14 +36,13 @@ CREATE TABLE executions (
 	verdict TEXT, -- OK, WA, RE, ML, TL, CE/CS (compile error/success), CC (checker crashed)
 	message TEXT, -- detailed message from checker
 	FOREIGN KEY (submission_id) REFERENCES submissions (id)
-	FOREIGN KEY (test_id) REFERENCES tests (id)
 );
 
 -- test data
-INSERT INTO problems (name, grading_type, user_visible) VALUES ("1) Heap sort",           "ints", true);
-INSERT INTO problems (name, grading_type, user_visible) VALUES ("2) Olimp 2020 A3 sheep", "ints", true);
-INSERT INTO problems (name, grading_type, user_visible) VALUES ("prob 3",                 "ints", false);
-INSERT INTO tests    (problem_id, inp_contents, out_contents, memory_limit, time_limit)
-       VALUES        (1, "3 3 1 2", "1 2 3", 1000000, 1000);
-INSERT INTO tests    (problem_id, inp_contents, out_contents, memory_limit, time_limit)
-       VALUES        (1, "4 3 1 2 9", "1 2 3 9", 1000000, 1000);
+INSERT INTO problems (name, user_visible) VALUES ("1) Heap sort",           true);
+INSERT INTO problems (name, user_visible) VALUES ("2) Olimp 2020 A3 sheep", true);
+INSERT INTO problems (name, user_visible) VALUES ("prob 3",                 false);
+INSERT INTO tests    (problem_id, inp_contents, out_contents, memory_limit, time_limit, grading_type)
+       VALUES        (1, "3 3 1 2", "1 2 3", 1000000, 1000, "ints");
+INSERT INTO tests    (problem_id, inp_contents, out_contents, memory_limit, time_limit, grading_type)
+       VALUES        (1, "4 3 1 2 9", "1 2 3 9", 1000000, 1000, "ints");

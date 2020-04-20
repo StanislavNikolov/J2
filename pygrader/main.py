@@ -4,12 +4,15 @@ import subprocess
 import os, sys
 import time
 import shutil
+import graders
 
 db = sys.argv[1]
 subId = sys.argv[2]
 print(f'Starting grader for db={db} and subId={subId}')
 
 conn = sqlite3.connect(db)
+# enable foreign keys https://cs.stanford.edu/people/widom/cs145/sqlite/SQLiteRefIntegrity.html
+conn.cursor().execute("PRAGMA foreign_keys = ON;")
 
 # fetch source code from db
 cur = conn.cursor()
@@ -48,14 +51,15 @@ def judge():
 
 	# get all the tests than need to be executed
 	cur.execute("""
-			SELECT    T.id, T.inp_contents, T.out_contents, T.memory_limit, T.time_limit
+			SELECT    T.id, T.inp_contents, T.out_contents, T.memory_limit, T.time_limit, T.grading_type
 			FROM      tests AS T
 			LEFT JOIN submissions AS S ON T.problem_id = S.problem_id
 			WHERE     S.id = ?
 			""", (subId,))
 
-	def run_test(tid, inp, out, meml, timel):
+	def run_test(tid, inp, out, meml, timel, grading_type):
 		# TODO memory limit
+
 		try:
 			solproc = subprocess.run(['./sol'],
 					input = inp.encode(),
@@ -67,15 +71,33 @@ def judge():
 			record_execution(tid, 'TL', None)
 			return
 
+		# crashed
 		if solproc.returncode != 0:
 			record_execution(tid, 'RE', solproc.stderr)
 			return
 
+		# check output
+		if grading_type not in graders.graders:
+			record_execution(tid, 'WA', solproc.stderr)
+			print('UNSUPORTED GRADING TYPE', grading_type)
+			return
+
+		if graders.graders[grading_type](out, solproc.stdout.decode()):
+			record_execution(tid, 'OK', solproc.stderr)
+			return
+		else:
+			record_execution(tid, 'WA', solproc.stderr)
+			return
+
 		record_execution(tid, 'OK', '')
 
-	for tid, inp, out, meml, timel in cur.fetchall():
+	for tid, inp, out, meml, timel, grading_type in cur.fetchall():
 		print(f'test {tid}', flush = True)
-		run_test(tid, inp, out, meml, timel)
+		try:
+			run_test(tid, inp, out, meml, timel, grading_type)
+		except Exception as error:
+			print('ERROR', error)
+			record_execution(tid, 'GE', None)
 
 judge()
 

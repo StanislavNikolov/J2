@@ -2,9 +2,14 @@ body {
 	display: flex;
 }
 
+.pane {
+	margin: 0.5rem;
+}
+
 /* left pane */
-#problist { padding-right: 1em; width: auto;
-	max-width: 50%;
+#problist {
+	width: auto;
+	max-width: min(20%, 20rem);
 }
 
 /* right pane */
@@ -21,24 +26,19 @@ body {
 }
 
 .problem {
-	list-style-type: none;
-	display: block;
-}
-
-.problem input {
-	display: none;
-}
-.problem .styleme {
+	margin-bottom: 0.5em !important;
 	width: 100%;
+	color: white;
 }
 
 /* make selected problem colored in some way */
 .problem.selected {
-	background-color: red;
+	font-weight: bolder;
+	background-color: #2c89c8;
 }
 
 .problem:hover {
-	background-color: gray;
+	background-color: #502aa1 !important;
 }
 
 /* submission table */
@@ -62,4 +62,8 @@ body {
 
 .execution.good {
 	background-color: #21ba45;
+}
+
+.submission.judging {
+	background-color: gray;
 }

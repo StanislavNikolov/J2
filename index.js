@@ -84,12 +84,6 @@ app.get('/submissions/:subId', (req, res) => {
 
 		const submissions = rows;
 
-		if(rows.length === 0) {
-			res.json({error: 'invalid subm id'});
-			console.log(`Ivalid submission id requested. ${req.params.subId}`);
-			return;
-		}
-
 		db.all(SQL, [req.params.subId], (err, rows) => {
 			if(err) {
 				res.json({error: 'database error'});
@@ -97,15 +91,11 @@ app.get('/submissions/:subId', (req, res) => {
 				return;
 			}
 			res.json({submissions: submissions, executions: rows});
-			//subm.score = 69;
 		});
-		//res.json({subm: submMeta, execs: rows});
 	});
 });
 
 app.post('/submit/:probId', (req, res) => {
-	console.log(req.body);
-
 	// safety checks
 	try {
 		if(req.body.code.length > 50000) {
@@ -117,7 +107,7 @@ app.post('/submit/:probId', (req, res) => {
 		return;
 	}
 
-	// TODO verify prob_id
+	// TODO verify prob has user_visible
 	// TODO rate limit
 
 	const submitDate = new Date();
@@ -152,14 +142,19 @@ app.get('/admin', (req, res) => {
 });
 
 let db = new sqlite3.Database('./database.sqlite3', (err) => {
-	if (err) {
+	if(err) {
 		console.error(err.message);
+		return;
 	}
+	db.run('PRAGMA foreign_keys = ON;', [], (err) => {
+		if(err) {
+			console.error(err.message);
+			return;
+		}
 
-	console.log('Connected to the database.');
+		console.log('Connected to the database.');
 
-	const port = process.env.port || 8080;
-	app.listen(port, () => {
-		console.log(`Listening on port ${port}!`)
+		const port = process.env.port || 8080;
+		app.listen(port, () => console.log(`Listening on port ${port}!`));
 	});
 });

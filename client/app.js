@@ -23,13 +23,11 @@ const watchSubmissionForUpdates = (subId, el) => {
 		fetch(`/submissions/${subId}`)
 		.then(resp => resp.json())
 		.then(data => {
-			console.log(data);
 			const newEl = renderSubmission(data.submissions[0], data.executions);
-			console.log(el.parentNode);
 			el.parentNode.replaceChild(newEl, el);
 			el = newEl;
 			if(data.submissions[0].judged !== 0) return;
-			setTimeout(poll, 50);
+			setTimeout(poll, 100);
 		});
 	};
 	poll();
@@ -52,7 +50,7 @@ sbmBtnEl.onclick = () => {
 	fetch(`/submit/${probId}`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({code: codeinputEl.value, problem: selectedProbEl.id})
+		body: JSON.stringify({code: codeinputEl.value})
 	})
 	.then(resp => resp.json())
 	.then(data => {
@@ -64,10 +62,10 @@ sbmBtnEl.onclick = () => {
 const renderProblemList = () => {
 	let first = true;
 	for(const prob of problems) {
-		const el = document.createElement('div')
+		const el = document.createElement('span')
 		problemListEl.appendChild(el);
 
-		el.classList.add('problem');
+		el.classList.add('problem', 'ui', 'button');
 		el.id = 'p$' + prob.id;
 		el.innerText = prob.name;
 		el.onclick = () => markSelected(el);
@@ -98,7 +96,7 @@ const renderSubmission = (sbm, executions) => {
 	el.id = 's$' + sbm.id;
 
 	// show animation if more executions are expected to come
-	if(sbm.judged === 0) el.classList.add('ui', 'placeholder');
+	if(sbm.judged === 0) el.classList.add('judging');
 
 	// get all executions for this submission
 	let execs = executions.filter(x => x.sid === sbm.id);
