@@ -17,15 +17,17 @@ body {
 }
 
 /* mid pane */
-#statement {
-	flex-grow: 1;
+#statementWrapper {
 	-webkit-box-shadow: 4px 4px 7px -1px rgba(0,0,0,0.75);
 	-moz-box-shadow: 4px 4px 7px -1px rgba(0,0,0,0.75);
 	box-shadow: 4px 4px 7px -1px rgba(0,0,0,0.75);
+}
+
+#statement {
 	min-width: 30rem;
 }
 
-#statement .pre {
+#statement.pre {
 	width: 100%;
 	height: 100%;
 	white-space: pre-wrap;

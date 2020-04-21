@@ -4,7 +4,7 @@ CREATE TABLE problems (
 	name TEXT NOT NULL UNIQUE,
 	checker_code TEXT,
 	statement_code TEXT, -- the bytes/text of the statement file
-	statement_type TEXT DEFAULT 'plaintext', -- PDF, HTML, URL, markdown or plaintext
+	statement_type TEXT, -- PDF, HTML, URL, markdown or plaintext
 	user_visible BOOLEAN NOT NULL -- should be hidden from users if false
 );
 

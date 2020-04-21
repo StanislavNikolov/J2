@@ -1,25 +1,69 @@
-comp=Зимни 2014
+comp=Зимни 2013
+st=http://www.math.bas.bg/infos/files/2013-03-03-@@.pdf
+g=E
+n=Агент 007, Рицарски щит, Разстояние
+a=http://www.math.bas.bg/infos/files/2013-03-03-tests&authors-E.zip
+g=D
+n=Ъгли, Главоблъсканица, Парк
+a=http://www.math.bas.bg/infos/files/2013-03-03-tests&authors-D.zip
+# weird archive TODO
+#g=C
+#n=Том Сойер, Шахматен кон, Карти
+#a=http://www.math.bas.bg/infos/files/2013-03-03-tests&authors-C.zip
 
+
+
+comp=Зимни 2014
+# yes, the link says 2013
+st=http://www.math.bas.bg/infos/files/2013-03-02-@@.pdf
 g=E
 n=Спирки,Камера,Брой и сума
 a=http://www.math.bas.bg/infos/files/2014-03-02-tests&authors-E.zip
-
 g=D
 n=Билярд, Монитори, Ученици
 a=http://www.math.bas.bg/infos/files/2014-03-02-tests&authors-D.zip
-
 g=C
 n=Скорости, Паякът Паркър, Планини
 a=http://www.math.bas.bg/infos/files/2014-03-02-tests&authors-C.zip
 
 
 
-comp=Зимни 2013
-
+comp=Зимни 2015
+st=http://www.math.bas.bg/infos/files/2015-03-01-@@.pdf
 g=E
 n=Дискусионна маса, Строител, Асансьор
 a=http://www.math.bas.bg/infos/files/2015-03-01-tests&authors-E.zip
-
 g=D
 n=Двоични числа, Експедиция, Тигани и капаци
 a=http://www.math.bas.bg/infos/files/2015-03-01-tests&authors-D.zip
+g=C
+n=Разшифриране, Работно време, Пръчка
+a=http://www.math.bas.bg/infos/files/2015-03-01-tests&authors-C.zip
+
+
+
+comp=Зимни 2016
+st=http://www.math.bas.bg/infos/files/2016-03-05-@@.pdf
+g=E
+n=Кубчета, Нива, Най-малко число
+a=http://www.math.bas.bg/infos/files/2016-03-05-tests&authors-E.zip
+g=D
+n=Улица с паметници, Аларма, Пипи дългото чорапче
+a=http://www.math.bas.bg/infos/files/2016-03-05-tests&authors-D.zip
+g=C
+n=Най-голям прост делител, Игра с шестоъгълници, Полети
+a=http://www.math.bas.bg/infos/files/2016-03-05-tests&authors-C.zip
+
+
+
+comp=Зимни 2017
+st=http://www.math.bas.bg/infos/files/2017-02-28-@@.pdf
+g=E
+n=Снежинка, Баскетбол, Копиране
+a=http://www.math.bas.bg/infos/files/2017-02-28-tests&authors-E.zip
+g=D
+n=Световен часовник, Подобни думи, Кратно на 3
+a=http://www.math.bas.bg/infos/files/2017-02-28-tests&authors-D.zip
+g=C
+n=Сума, Матрица, Успоредници
+a=http://www.math.bas.bg/infos/files/2017-02-28-tests&authors-C.zip

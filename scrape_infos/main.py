@@ -15,18 +15,22 @@ def add_test(prob_id, inp, sol):
 	""", (prob_id, inp, sol, 256 * 1024 * 1024))
 	conn.commit()
 
-def add_to_db(db_name, tests_path, author_path):
+def add_problem_to_db(db_name, statement_path, tests_path, author_path):
 	cur = conn.cursor()
 	cur.execute('SELECT id FROM problems WHERE name = ?', (db_name,))
 	prob_id = cur.fetchone()
 	if prob_id == None: # not in db yet; create it
-		cur.execute('INSERT INTO problems (name, user_visible) VALUES (?, true)', (db_name,))
+		with open(statement_path, 'rb') as f: statement = f.read()
+
+		cur.execute("""
+		INSERT INTO problems
+		(name, user_visible, statement_code, statement_type)
+		VALUES (?, true, ?, 'PDF')
+		""", (db_name, statement))
 		conn.commit()
 		prob_id = cur.lastrowid
 	else:
 		prob_id = prob_id[0]
-
-	print(prob_id)
 
 	tests = {'in': {}, 'sol': {}}
 	for filename in sorted(os.listdir(tests_path)):
@@ -40,7 +44,7 @@ def add_to_db(db_name, tests_path, author_path):
 				print('Weird extension?', filename)
 
 		except ValueError: # sometimes there are non test files in the test directory
-			print('Not a test?', filename)
+			print('Not a test?', tests_path, filename)
 
 	ins  = set(tests['in'].keys())
 	sols = set(tests['sol'].keys())
@@ -52,7 +56,7 @@ def add_to_db(db_name, tests_path, author_path):
 	cur.execute('SELECT COUNT(*) FROM tests WHERE problem_id = ?', (prob_id, ))
 	inserted_cnt = cur.fetchone()[0]
 	if inserted_cnt == len(both):
-		print(db_name, prob_id, 'already inserted', len(both), 'tests')
+		#print(db_name, prob_id, 'already inserted', len(both), 'tests')
 		return
 
 	if inserted_cnt != 0:
@@ -65,8 +69,8 @@ def add_to_db(db_name, tests_path, author_path):
 		with open(tests['sol'][idx]) as f: sol = f.read()
 		add_test(prob_id, inp, sol)
 
-def execute(comp, problems, group, archve):
-	print(comp, problems, group, archive)
+def execute(comp, problems, group, statement_templ, archve):
+	print('Execute', comp, problems, group, archive)
 	os.system(f"mkdir -p 'archives/{comp}'")
 	os.system(f"cd 'archives/{comp}'; wget '{archive}' -nc -q -O '{group}.zip'")
 	os.system(f"cd 'archives/{comp}'; unzip -q -n '{group}.zip' -d '{group}'")
@@ -77,10 +81,14 @@ def execute(comp, problems, group, archve):
 			problem_name_short = raw_problem.split('-')[1].strip()
 			problem_name_full = problems[problem_idx]
 
+			statement_id = f'{group}{problem_idx+1}'
+			statement = statement_templ.replace('@@', statement_id)
+			os.system(f"cd 'archives/{comp}'; wget '{statement}' -q -O '{statement_id}.pdf'")
+
 			db_name = f'{comp}/{group}/{problem_idx+1} - {problem_name_full}'
 			tests_path = os.path.join(dirpath, 'tests')
 			author_path = os.path.join(dirpath, 'author')
-			add_to_db(db_name, tests_path, author_path)
+			add_problem_to_db(db_name, f'archives/{comp}/{statement_id}.pdf', tests_path, author_path)
 
 with open('src') as f:
 	for line in [l.strip() for l in f.readlines()]:
@@ -93,6 +101,8 @@ with open('src') as f:
 			curr_problems = [name.strip() for name in arg.split(',')]
 		if cmd == 'g':
 			curr_group = arg
+		if cmd == 'st':
+			statement_templ = arg
 		if cmd == 'a':
 			archive = arg
-			execute(current_comp, curr_problems, curr_group, archive)
+			execute(current_comp, curr_problems, curr_group, statement_templ, archive)

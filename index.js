@@ -10,7 +10,11 @@ app.use(express.static('client/'));
 app.use(express.static('node_modules/semantic-ui-offline/'));
 
 app.get('/problems', (req, res) => {
-	const SQL = `SELECT id, name, statement_type FROM problems WHERE user_visible = true`;
+	const SQL = `
+	SELECT id, name, statement_type
+	FROM problems
+	WHERE user_visible = true
+	ORDER BY name`;
 	db.all(SQL, [], (err, rows) => {
 		if (err) {
 			res.json({error: 'database error'});
@@ -133,13 +137,20 @@ app.post('/submit/:probId', (req, res) => {
 });
 
 app.get('/statement/:probId', (req, res) => {
-	const SQL = 'SELECT statement_code FROM problems WHERE id = ? ORDER BY id';
-	db.all(SQL, [req.params.probId], (err, rows) => {
+	let probId = req.params.probId;
+	if(probId.endsWith('.pdf')) {
+		probId = probId.slice(0, -4);
+	}
+
+	const SQL = 'SELECT statement_code, statement_type FROM problems WHERE id = ?';
+	db.all(SQL, [probId], (err, rows) => {
 		if(err) {
 			res.send('Database error');
 			console.log('Database error', err);
 			return;
 		}
+		if(rows[0].statement_type === 'PDF') res.set('content-type', 'application/pdf');
+		if(rows[0].statement_type === 'HTML') res.set('content-type', 'text/html');
 		res.send(rows[0].statement_code);
 	});
 });

@@ -25,17 +25,21 @@ const showCorrectStatement = () => {
 	const probId = Number(selectedProbEl.id.substring(2));
 	const prob = problems.find(x => x.id === probId);
 
-	if(prob.statement_type === 'PDF') {
-		document.getElementById('statement').innerHTML = `
-		<object type="application/pdf" data="/statement/${prob.id}" width=100% height=100%>
+	const wrapper = document.getElementById('statementWrapper');
+	if(prob.statement_type == null) {
+		wrapper.innerHTML = '';
+	} else if(prob.statement_type === 'PDF') {
+		wrapper.innerHTML = `
+		<object id='statement' type="application/pdf" data="/statement/${prob.id}.pdf" width=100% height=100%>
 			<p>Statement cannot be displayed :(</p>
 		</object>
 		`;
+		console.log('asd');
 	} else if(prob.statement_type === 'plaintext') {
 		fetch(`/statement/${prob.id}`)
 		.then(resp => resp.text())
 		.then(statement => {
-			document.getElementById('statement').innerHTML = `<div class='pre'>${statement}</div>`;
+			wrapper.innerHTML = `<div class='pre'>${statement}</div>`;
 		});
 	} else {
 		// TODO
@@ -51,7 +55,11 @@ const watchSubmissionForUpdates = (subId, el) => {
 			const newEl = renderSubmission(data.submissions[0], data.executions);
 			el.parentNode.replaceChild(newEl, el);
 			el = newEl;
-			if(data.submissions[0].judged !== 0) return;
+			if(data.submissions[0].judged !== 0) {
+				submissions.push(data.submissions[0]);
+				executions = executions.concat(data.executions);
+				return;
+			}
 			setTimeout(poll, 100);
 		});
 	};
