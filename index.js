@@ -9,6 +9,15 @@ app.use(express.urlencoded({ extended: true }))
 app.use(express.static('client/'));
 app.use(express.static('node_modules/semantic-ui-offline/'));
 
+const adminOnly = (req, res, next) => {
+	if(req.ip === '::1' || req.ip === '::ffff:127.0.0.1') {
+		next();
+		return;
+	}
+	console.log('Not admin', req.ip);
+	res.send('Not allowed');
+};
+
 app.get('/problems', (req, res) => {
 	const SQL = `
 	SELECT id, name, statement_type
@@ -155,13 +164,33 @@ app.get('/statement/:probId', (req, res) => {
 	});
 });
 
-app.get('/admin', (req, res) => {
-	console.log(req.ip);
-	if(req.ip !== '::1') {
-		res.send('Not allowed');
-		return;
-	}
-	res.send('Hey master');
+app.get('/admin',         adminOnly, (req, res) => res.sendFile('admin/index.html', {root: __dirname}));
+app.get('/admin/app.css', adminOnly, (req, res) => res.sendFile('admin/app.css'   , {root: __dirname}));
+app.get('/admin/app.js',  adminOnly, (req, res) => res.sendFile('admin/app.js'    , {root: __dirname}));
+
+app.get('/admin/problems', adminOnly, (req, res) => {
+	const SQL = 'SELECT id, name, user_visible FROM problems ORDER BY name';
+	db.all(SQL, [], (err, rows) => {
+		if(err) {
+			res.send('Database error');
+			console.log('Database error', err);
+			return;
+		}
+		res.json(rows);
+	});
+});
+
+app.post('/admin/set_state/:probId/:userVisible', adminOnly, (req, res) => {
+	const SQL = 'UPDATE problems SET user_visible = ? WHERE id = ?';
+
+	db.run(SQL, [req.params.userVisible, req.params.probId],  (err) => {
+		if(err) {
+			res.send('Database error');
+			console.log('Database error', err);
+			return;
+		}
+		res.json({error: null});
+	});
 });
 
 let db = new sqlite3.Database('./database.sqlite3', (err) => {

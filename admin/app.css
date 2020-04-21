@@ -1,0 +1,7 @@
+.problem {
+	margin: 0.1rem !important;
+}
+
+.problem.hidden {
+	opacity: 0.2;
+}

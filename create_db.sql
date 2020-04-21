@@ -41,10 +41,10 @@ CREATE TABLE executions (
 );
 
 -- test data
-INSERT INTO problems (name, user_visible) VALUES ("1) Heap sort",           true);
-INSERT INTO problems (name, user_visible) VALUES ("2) Olimp 2020 A3 sheep", true);
-INSERT INTO problems (name, user_visible) VALUES ("prob 3",                 false);
-INSERT INTO tests    (problem_id, inp_contents, out_contents, memory_limit, time_limit, grading_type)
-       VALUES        (1, "3 3 1 2", "1 2 3", 1000000, 1000, "ints");
-INSERT INTO tests    (problem_id, inp_contents, out_contents, memory_limit, time_limit, grading_type)
-       VALUES        (1, "4 3 1 2 9", "1 2 3 9", 1000000, 1000, "ints");
+--INSERT INTO problems (name, user_visible) VALUES ("1) Heap sort",           true);
+--INSERT INTO problems (name, user_visible) VALUES ("2) Olimp 2020 A3 sheep", true);
+--INSERT INTO problems (name, user_visible) VALUES ("prob 3",                 false);
+--INSERT INTO tests    (problem_id, inp_contents, out_contents, memory_limit, time_limit, grading_type)
+       --VALUES        (1, "3 3 1 2", "1 2 3", 1000000, 1000, "ints");
+--INSERT INTO tests    (problem_id, inp_contents, out_contents, memory_limit, time_limit, grading_type)
+       --VALUES        (1, "4 3 1 2 9", "1 2 3 9", 1000000, 1000, "ints");
