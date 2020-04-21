@@ -5,6 +5,7 @@ import os, sys
 import time
 import shutil
 import graders
+import re
 
 db = sys.argv[1]
 subId = sys.argv[2]
@@ -58,14 +59,27 @@ def judge():
 			""", (subId,))
 
 	def run_test(tid, inp, out, meml, timel, grading_type):
-		# TODO memory limit
-
 		try:
-			solproc = subprocess.run(['./sol'],
+			cmd = ['firejail', '--noprofile',
+					'--private', '--net=none', '--noroot', '--seccomp', '--shell=none',
+					f'--rlimit-as={meml}', './sol']
+
+			MAX_SANDBOX_OVERHEAD = 0.1
+
+			begin = time.time()
+			solproc = subprocess.run(cmd,
 					input = inp.encode(),
-					timeout = timel / 1000,
+					timeout = timel / 1000 + MAX_SANDBOX_OVERHEAD,
 					capture_output = True,
+					shell = False,
 					env = None)
+			end = time.time()
+
+			ugly_sandbox_overhead = re.search('[0-9]*.[0-9]* ms', solproc.stderr.decode()).group()
+			sandbox_overhead = float(ugly_sandbox_overhead[:-3])
+
+			if end - begin - sandbox_overhead > timel:
+				record_execution(tid, 'TL', None)
 		except subprocess.TimeoutExpired:
 			# timed out
 			record_execution(tid, 'TL', None)
@@ -73,29 +87,35 @@ def judge():
 
 		# crashed
 		if solproc.returncode != 0:
-			record_execution(tid, 'RE', solproc.stderr)
+			record_execution(tid, 'RE', None)
 			return
+
+		# https://github.com/netblue30/firejail/blob/6f3867fdb8cdaca3ffd62eb824c10d42a5250c9c/src/firejail/env.c#L162
+		# firejail spams stdout with useless shit. --quiet stops it, but stops usefull overhead data too!
+		spam = b'\x1b]0;firejail ./sol \x07'
+		user_output = solproc.stdout[len(spam):].decode() # remove firejail request to terminal to change window title
 
 		# check output
 		if grading_type not in graders.graders:
-			record_execution(tid, 'WA', solproc.stderr)
+			record_execution(tid, 'GA', None)
 			print('UNSUPORTED GRADING TYPE', grading_type)
 			return
 
-		if graders.graders[grading_type](out, solproc.stdout.decode()):
-			record_execution(tid, 'OK', solproc.stderr)
+		if graders.graders[grading_type](out, user_output):
+			record_execution(tid, 'OK', None)
 			return
 		else:
-			record_execution(tid, 'WA', solproc.stderr)
+			record_execution(tid, 'WA', None)
 			return
 
 		record_execution(tid, 'OK', '')
 
 	for tid, inp, out, meml, timel, grading_type in cur.fetchall():
-		print(f'test {tid}', flush = True)
 		try:
 			run_test(tid, inp, out, meml, timel, grading_type)
 		except Exception as error:
+			import traceback
+			traceback.print_exc()
 			print('ERROR', error)
 			record_execution(tid, 'GE', None)
 

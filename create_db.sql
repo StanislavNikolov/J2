@@ -14,7 +14,6 @@ CREATE TABLE submissions (
 	judged BOOLEAN NOT NULL DEFAULT FALSE,
 	user_key TEXT,
 	date DATE NOT NULL,
-	-- TODO user_key
 	ip TEXT,
 	source_code TEXT NOT NULL,
 	FOREIGN KEY (problem_id) REFERENCES problems (id)

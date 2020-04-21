@@ -4,7 +4,7 @@ def tokenify(string):
 	return list(filter(lambda s: len(s) > 0,
 		string.replace('\n', ' ').replace('\r', ' ').replace('\t', ' ').split(' ')))
 
-def tokens(corr, sol):
+def tokens(sol, corr):
 	tcorr = tokenify(corr)
 	tsol = tokenify(sol)
 

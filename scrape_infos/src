@@ -3,9 +3,9 @@ st=http://www.math.bas.bg/infos/files/2013-03-03-@@.pdf
 g=E
 n=Агент 007, Рицарски щит, Разстояние
 a=http://www.math.bas.bg/infos/files/2013-03-03-tests&authors-E.zip
-g=D
-n=Ъгли, Главоблъсканица, Парк
-a=http://www.math.bas.bg/infos/files/2013-03-03-tests&authors-D.zip
+#g=D
+#n=Ъгли, Главоблъсканица, Парк
+#a=http://www.math.bas.bg/infos/files/2013-03-03-tests&authors-D.zip
 # weird archive TODO
 #g=C
 #n=Том Сойер, Шахматен кон, Карти
