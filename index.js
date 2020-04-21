@@ -62,6 +62,8 @@ app.get('/submissions/:subId', (req, res) => {
 		req.params.subId = null;
 	}
 
+	const userKey = req.headers['x-user-key'];
+
 	// get basic submission metadata
 	const SQL = `
 	SELECT id, problem_id, date, judged,
@@ -78,9 +80,10 @@ app.get('/submissions/:subId', (req, res) => {
 	       ) AS score
 	FROM   submissions
 	WHERE  ($1 IS NULL OR id = $1)
+	   AND user_key = $2
 	`;
 
-	db.all(SQL, [req.params.subId], (err, rows) => {
+	db.all(SQL, [req.params.subId, userKey], (err, rows) => {
 		if(err) {
 			res.json({error: 'database error'});
 			console.log(`Database error (1): ${err}`);
@@ -91,13 +94,13 @@ app.get('/submissions/:subId', (req, res) => {
 		SELECT E.id AS id, S.id AS sid, E.test_id, E.verdict, E.message
 		FROM executions AS E
 		JOIN submissions AS S ON E.submission_id = S.id
-		WHERE ($1 IS NULL OR S.id = $1)
+		WHERE ($1 IS NULL OR S.id = $1) AND S.user_key = $2
 		ORDER BY E.submission_id
 		`;
 
 		const submissions = rows;
 
-		db.all(SQL, [req.params.subId], (err, rows) => {
+		db.all(SQL, [req.params.subId, userKey], (err, rows) => {
 			if(err) {
 				res.json({error: 'database error'});
 				console.log(`Database error (2): ${err}`);
@@ -106,6 +109,9 @@ app.get('/submissions/:subId', (req, res) => {
 			res.json({submissions: submissions, executions: rows});
 		});
 	});
+});
+
+app.get('/standings', (req, res) => {
 });
 
 app.post('/submit/:probId', (req, res) => {
@@ -127,11 +133,12 @@ app.post('/submit/:probId', (req, res) => {
 
 	const SQL = `
 	INSERT INTO submissions
-	(problem_id, ip, date, source_code)
-	VALUES (?, ?, ?, ?)
+	(problem_id, date, source_code, ip, user_key)
+	VALUES (?, ?, ?, ?, ?)
 	`;
 
-	db.run(SQL, [req.params.probId, req.ip, submitDate, req.body.code], function(err) {
+	const params = [req.params.probId, submitDate, req.body.code, req.ip, req.headers['x-user-key']];
+	db.run(SQL, params, function(err) {
 		if(err) {
 			res.json({error: 'Database error'});
 			console.log(`Database error: ${err}`);

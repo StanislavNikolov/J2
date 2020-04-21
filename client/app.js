@@ -1,3 +1,10 @@
+let userKey = localStorage.getItem('user_key');
+if(userKey == null) {
+	userKey = Math.random().toString(36).substring(2);
+	localStorage.setItem('user_key', userKey);
+}
+console.log(userKey);
+
 const problemListEl = document.getElementById('problist');
 const sbmTableEl  = document.getElementById('submissionsList').getElementsByTagName('tbody')[0];
 const sbmBtnEl    = document.getElementById('submit');
@@ -34,7 +41,6 @@ const showCorrectStatement = () => {
 			<p>Statement cannot be displayed :(</p>
 		</object>
 		`;
-		console.log('asd');
 	} else if(prob.statement_type === 'plaintext') {
 		fetch(`/statement/${prob.id}`)
 		.then(resp => resp.text())
@@ -49,7 +55,7 @@ const showCorrectStatement = () => {
 
 const watchSubmissionForUpdates = (subId, el) => {
 	const poll = () => {
-		fetch(`/submissions/${subId}`)
+		fetch(`/submissions/${subId}`, {headers: {'X-user-key': userKey}})
 		.then(resp => resp.json())
 		.then(data => {
 			const newEl = renderSubmission(data.submissions[0], data.executions);
@@ -82,12 +88,11 @@ sbmBtnEl.onclick = () => {
 	const probId = selectedProbEl.id.substring(2);
 	fetch(`/submit/${probId}`, {
 		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
+		headers: { 'Content-Type': 'application/json', 'X-user-key': userKey },
 		body: JSON.stringify({code: codeinputEl.value})
 	})
 	.then(resp => resp.json())
 	.then(data => {
-		console.log(data.id);
 		watchSubmissionForUpdates(data.id, placeholderEl);
 	});
 };
@@ -189,7 +194,7 @@ window.onload = () => {
 		ready('problems');
 	});
 
-	fetch('/submissions/all')
+	fetch('/submissions/all', { headers: {'X-user-key': userKey} })
 	.then(resp => resp.json())
 	.then(json => {
 		submissions = json.submissions;

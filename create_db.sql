@@ -12,6 +12,7 @@ CREATE TABLE submissions (
 	id INTEGER NOT NULL PRIMARY KEY,
 	problem_id INTEGER NOT NULL,
 	judged BOOLEAN NOT NULL DEFAULT FALSE,
+	user_key TEXT,
 	date DATE NOT NULL,
 	-- TODO user_key
 	ip TEXT,
