@@ -10,7 +10,10 @@ body {
 /* left pane */
 #problist {
 	width: auto;
+	min-width: 7rem;
 	max-width: min(20%, 20rem);
+	overflow-y: scroll;
+	overflow-x: hidden;
 }
 
 /* mid pane */
@@ -19,6 +22,7 @@ body {
 	-webkit-box-shadow: 4px 4px 7px -1px rgba(0,0,0,0.75);
 	-moz-box-shadow: 4px 4px 7px -1px rgba(0,0,0,0.75);
 	box-shadow: 4px 4px 7px -1px rgba(0,0,0,0.75);
+	min-width: 30rem;
 }
 
 #statement .pre {
@@ -71,6 +75,7 @@ body {
 	border-radius: 0.25rem;
 	font-family: monospace;
 	font-size: small;
+	display: inline-block;
 }
 
 .execution.bad {

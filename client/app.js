@@ -26,25 +26,20 @@ const showCorrectStatement = () => {
 	const prob = problems.find(x => x.id === probId);
 
 	if(prob.statement_type === 'PDF') {
-		type = 'application/pdf';
-	} else if(prob.statement_type === 'plaintext') {
-		type = 'text/plain';
-	} else if(prob.statement_type === 'plaintext') {
-		type = 'text/html';
-	}
-
-	if(type === 'text/html' || type === 'application/pdf') {
 		document.getElementById('statement').innerHTML = `
-		<object type="${type}" data="/statement/${prob.id}" width=100% height=100%>
+		<object type="application/pdf" data="/statement/${prob.id}" width=100% height=100%>
 			<p>Statement cannot be displayed :(</p>
 		</object>
 		`;
-	} else {
+	} else if(prob.statement_type === 'plaintext') {
 		fetch(`/statement/${prob.id}`)
 		.then(resp => resp.text())
 		.then(statement => {
 			document.getElementById('statement').innerHTML = `<div class='pre'>${statement}</div>`;
 		});
+	} else {
+		// TODO
+		console.error('Unsupported statement type', prob.statement_type);
 	}
 };
 
@@ -93,6 +88,7 @@ const renderProblemList = () => {
 	let first = true;
 	for(const prob of problems) {
 		const el = document.createElement('span')
+		//el.setAttribute('d
 		problemListEl.appendChild(el);
 
 		el.classList.add('problem', 'ui', 'button');

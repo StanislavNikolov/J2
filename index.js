@@ -133,7 +133,7 @@ app.post('/submit/:probId', (req, res) => {
 });
 
 app.get('/statement/:probId', (req, res) => {
-	const SQL = 'SELECT statement_code FROM problems WHERE id = ?';
+	const SQL = 'SELECT statement_code FROM problems WHERE id = ? ORDER BY id';
 	db.all(SQL, [req.params.probId], (err, rows) => {
 		if(err) {
 			res.send('Database error');

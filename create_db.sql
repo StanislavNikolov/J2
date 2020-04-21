@@ -1,10 +1,10 @@
 -- schema
 CREATE TABLE problems (
 	id INTEGER NOT NULL PRIMARY KEY,
-	name TEXT NOT NULL,
+	name TEXT NOT NULL UNIQUE,
 	checker_code TEXT,
 	statement_code TEXT, -- the bytes/text of the statement file
-	statement_type TEXT DEFAULT 'plaintext', -- PDF, HTML, markdown or plaintext
+	statement_type TEXT DEFAULT 'plaintext', -- PDF, HTML, URL, markdown or plaintext
 	user_visible BOOLEAN NOT NULL -- should be hidden from users if false
 );
 
@@ -26,7 +26,7 @@ CREATE TABLE tests (
 	out_contents TEXT, -- visible to checker only
 	memory_limit INTEGER NOT NULL, -- in bytes
 	time_limit float NOT NULL, -- in miliseconds
-	grading_type TEXT NOT NULL, -- ints, floats, strings, custom_checker
+	grading_type TEXT NOT NULL, -- tokens, floats, strings, custom_checker
 	FOREIGN KEY (problem_id) REFERENCES problems (id)
 );
 
