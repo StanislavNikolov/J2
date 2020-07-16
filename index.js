@@ -2,6 +2,7 @@ const sqlite3 = require('sqlite3').verbose();
 const express = require('express');
 const app     = express();
 const workers = require('./workers.js');
+const logger  = require('./logger.js');
 
 app.set('view engine', 'pug'); // res.render
 app.use(express.json()); // req.body
@@ -14,7 +15,7 @@ const adminOnly = (req, res, next) => {
 		next();
 		return;
 	}
-	console.log('Not admin', req.ip);
+	logger.log('verbose', 'External IP tried to open admin interface', {details: req.ip});
 	res.send('Not allowed');
 };
 
@@ -26,8 +27,8 @@ app.get('/problems', (req, res) => {
 	ORDER BY name`;
 	db.all(SQL, [], (err, rows) => {
 		if (err) {
+			logger.warn('Database error', {details: err});
 			res.json({error: 'database error'});
-			console.log(`Database error: ${err}`);
 			return;
 		}
 
@@ -85,8 +86,8 @@ app.get('/submissions/:subId', (req, res) => {
 
 	db.all(SQL, [req.params.subId, userKey], (err, rows) => {
 		if(err) {
+			logger.warn('Database error (submissions/, 1)', {details: {dberr: err, user_key: userKey}});
 			res.json({error: 'database error'});
-			console.log(`Database error (1): ${err}`);
 			return;
 		}
 
@@ -102,8 +103,8 @@ app.get('/submissions/:subId', (req, res) => {
 
 		db.all(SQL, [req.params.subId, userKey], (err, rows) => {
 			if(err) {
+				logger.warn('Database error (submissions/, 2)', {details: {dberr: err, user_key: userKey}});
 				res.json({error: 'database error'});
-				console.log(`Database error (2): ${err}`);
 				return;
 			}
 			res.json({submissions: submissions, executions: rows});
@@ -137,11 +138,12 @@ app.post('/submit/:probId', (req, res) => {
 	VALUES (?, ?, ?, ?, ?)
 	`;
 
-	const params = [req.params.probId, submitDate, req.body.code, req.ip, req.headers['x-user-key']];
+	const userKey = req.headers['x-user-key']
+	const params = [req.params.probId, submitDate, req.body.code, req.ip, userKey];
 	db.run(SQL, params, function(err) {
 		if(err) {
+			logger.warn('Database error (submit/)', {details: {dberr: err, user_key: userKey}});
 			res.json({error: 'Database error'});
-			console.log(`Database error: ${err}`);
 			return;
 		}
 
@@ -161,8 +163,8 @@ app.get('/statement/:probId', (req, res) => {
 	const SQL = 'SELECT statement_code, statement_type FROM problems WHERE id = ?';
 	db.all(SQL, [probId], (err, rows) => {
 		if(err) {
+			logger.warn('Database error (statement/)', {details: {dberr: err, prob_id: probId}});
 			res.send('Database error');
-			console.log('Database error', err);
 			return;
 		}
 		if(rows[0].statement_type === 'PDF') res.set('content-type', 'application/pdf');
@@ -179,8 +181,8 @@ app.get('/admin/problems', adminOnly, (req, res) => {
 	const SQL = 'SELECT id, name, user_visible FROM problems ORDER BY name';
 	db.all(SQL, [], (err, rows) => {
 		if(err) {
+			logger.warn('Database error (admin/problems/)', {details: {dberr: err}});
 			res.send('Database error');
-			console.log('Database error', err);
 			return;
 		}
 		res.json(rows);
@@ -192,8 +194,8 @@ app.post('/admin/set_state/:probId/:userVisible', adminOnly, (req, res) => {
 
 	db.run(SQL, [req.params.userVisible, req.params.probId],  (err) => {
 		if(err) {
+			logger.warn('Database error (admin/set_state/)', {details: {dberr: err, req_params: req.params}});
 			res.send('Database error');
-			console.log('Database error', err);
 			return;
 		}
 		res.json({error: null});
@@ -202,18 +204,26 @@ app.post('/admin/set_state/:probId/:userVisible', adminOnly, (req, res) => {
 
 let db = new sqlite3.Database('./database.sqlite3', (err) => {
 	if(err) {
-		console.error(err.message);
+		logger.error("Couldn't connect to database");
 		return;
 	}
+
 	db.run('PRAGMA foreign_keys = ON;', [], (err) => {
 		if(err) {
-			console.error(err.message);
+			logger.error("Couldn't set foreign_keys=ON after connecting to the database");
 			return;
 		}
 
-		console.log('Connected to the database.');
+		logger.info('Connected to the database.');
 
 		const port = process.env.port || 8080;
-		app.listen(port, () => console.log(`Listening on port ${port}!`));
+		app.listen(port, () => {
+			console.log(`
+        ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+        ┃    User interface:  http://localhost:${port}          ┃
+        ┃    Admin interface: http://localhost:${port}/admin    ┃
+        ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+			`);
+		});
 	});
 });
