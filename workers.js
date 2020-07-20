@@ -1,4 +1,5 @@
 const { spawn } = require('child_process');
+const logger = require('./logger.js');
 
 const startGrader = (subId) => {
 	const process = spawn('python3', ['main.py', `${__dirname}/database.sqlite3`, subId], { cwd: `${__dirname}/pygrader` });
@@ -9,21 +10,21 @@ const startGrader = (subId) => {
 	let timeoutID = null;
 	const timeout = 60; // in seconds
 
-	process.stdout.on('data', (data) => { console.log('grader:', data.toString()); });
-	process.stderr.on('data', (data) => { console.log('grader:', data.toString()); });
+	process.stdout.on('data', (data) => { logger.verbose('grader stdout: ' + data.toString()) });
+	process.stderr.on('data', (data) => { logger.verbose('grader stderr: ' + data.toString()) });
 
 	process.on('exit', (exitCode, signal) => {
-		console.log('Grader exited');
+		logger.verbose('Grader exited')
 		clearTimeout(timeoutID);
 	});
 
 	process.on('error', (data) => {
-		console.log('Maybe process couldnt be started?', {errordata: data});
+		logger.verbose("Grader process error -  maybe process couldn't be started", {details: data});
 		clearTimeout(timeoutID);
 	});
 
 	timeoutID = setTimeout(() => {
-		console.log('Grader killed because of timeout');
+		logger.verbose("Grader killed because of timeout");
 		process.kill();
 	}, timeout * 1000);
 };

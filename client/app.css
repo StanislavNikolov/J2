@@ -7,25 +7,38 @@ body {
 	margin: 0.5rem;
 }
 
-/* left pane */
+/***** left pane *****/
 #problist {
 	width: auto;
-	min-width: 7rem;
-	max-width: min(20%, 20rem);
+	min-width: 10rem;
+	max-width: min(20%, 15rem);
 	overflow-y: scroll;
 	overflow-x: hidden;
 }
 
-/* mid pane */
+#problist .problem {
+	margin-bottom: 0.3em !important;
+	width: 100%;
+	text-align: left;
+}
+
+/* make selected problem colored in some way */
+#problist .problem.selected {
+	font-weight: bolder;
+	background-color: #8D8741;
+}
+
+#problist .problem:hover {
+	background-color: #DAAD86 !important;
+}
+
+/***** mid pane *****/
 #statementWrapper {
 	-webkit-box-shadow: 4px 4px 7px -1px rgba(0,0,0,0.75);
 	-moz-box-shadow: 4px 4px 7px -1px rgba(0,0,0,0.75);
 	box-shadow: 4px 4px 7px -1px rgba(0,0,0,0.75);
 	flex-grow: 1;
-}
-
-#statement {
-	min-width: 30rem;
+	flex-basis: 50rem;
 }
 
 #statement.pre {
@@ -36,37 +49,21 @@ body {
 	overflow-y: scroll;
 }
 
-/* right pane */
+/***** right pane *****/
 #action {
-	flex-grow: 1;
 	display: flex;
 	flex-direction: column;
 }
 
 #codeinput {
+	margin-top: 1rem;
 	flex-grow: 1;
 	font-family: monospace;
 	font-size: x-small;
-}
-
-.problem {
-	margin-bottom: 0.5em !important;
-	width: 100%;
-	color: white;
-}
-
-/* make selected problem colored in some way */
-.problem.selected {
-	font-weight: bolder;
-	background-color: #2c89c8;
-}
-
-.problem:hover {
-	background-color: #502aa1 !important;
+	resize: none;
 }
 
 /* submission table */
-
 #submissionsListWrapper {
 	max-height: 60vh;
 	overflow-y: scroll;

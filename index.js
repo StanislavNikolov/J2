@@ -116,13 +116,17 @@ app.get('/standings', (req, res) => {
 });
 
 app.post('/submit/:probId', (req, res) => {
+	const userKey = req.headers['x-user-key'];
+
 	// safety checks
 	try {
 		if(req.body.code.length > 50000) {
+			logger.info("Denied solution - code above maximum allowed length", {details: {user_key: userKey}});
 			res.json({error: 'code too long'});
 			return;
 		}
 	} catch {
+		logger.info("Denied solution - invalid? code", {details: {user_key: userKey}});
 		res.json({error: 'bad code'});
 		return;
 	}
@@ -138,7 +142,6 @@ app.post('/submit/:probId', (req, res) => {
 	VALUES (?, ?, ?, ?, ?)
 	`;
 
-	const userKey = req.headers['x-user-key']
 	const params = [req.params.probId, submitDate, req.body.code, req.ip, userKey];
 	db.run(SQL, params, function(err) {
 		if(err) {
@@ -146,6 +149,8 @@ app.post('/submit/:probId', (req, res) => {
 			res.json({error: 'Database error'});
 			return;
 		}
+
+		logger.info("Accepted solution", {details: {user_key: userKey}});
 
 		// start worker
 		workers.startGrader(this.lastID);
@@ -208,6 +213,7 @@ let db = new sqlite3.Database('./database.sqlite3', (err) => {
 		return;
 	}
 
+	// enable foreign keys https://cs.stanford.edu/people/widom/cs145/sqlite/SQLiteRefIntegrity.html
 	db.run('PRAGMA foreign_keys = ON;', [], (err) => {
 		if(err) {
 			logger.error("Couldn't set foreign_keys=ON after connecting to the database");

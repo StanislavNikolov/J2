@@ -101,12 +101,11 @@ const renderProblemList = () => {
 	let first = true;
 	for(const prob of problems) {
 		const el = document.createElement('span')
-		//el.setAttribute('d
 		problemListEl.appendChild(el);
 
 		el.classList.add('problem', 'ui', 'button');
 		el.id = 'p$' + prob.id;
-		el.innerText = prob.name;
+		el.innerText = prob.name.replace('-', '\n');
 		el.onclick = () => markSelected(el);
 
 		if(first) {
@@ -118,13 +117,15 @@ const renderProblemList = () => {
 
 const renderExecution = (exec) => {
 	const el = document.createElement('span');
-	if(exec.verdict === 'CS') return el;
+	if(exec.verdict === 'CS') return el; // effectively do not render 'CS' executions
 
 	el.classList.add('execution');
-	if(exec.verdict === 'OK') el.classList.add('good');
-	else                      el.classList.add('bad');
+	el.classList.add(exec.verdict === 'OK' ? 'good' : 'bad');
 
-	el.innerHTML = `${exec.verdict}`;
+	// expand 'CE' text
+	if(exec.verdict === 'CE') exec.verdict = 'Compilation error';
+
+	el.innerText = exec.verdict;
 	return el;
 };
 
@@ -150,8 +151,9 @@ const renderSubmission = (sbm, executions) => {
 	const date = (new Date(sbm.date)).toISOString().substring(0, 16).replace('T', ' ');
 	const score = (sbm.score == null ? 0 : sbm.score.toFixed());
 
+	// TODO features: make the download button work
 	const dlBtnHTML = `<button class="ui mini compact icon button"><i class="download icon"></i></button>`;
-	el.innerHTML = `<td>${date}</td><td>${score}</td><td>${details.innerHTML}</td><td>${dlBtnHTML}`;
+	el.innerHTML = `<td>${date}</td><td>${score}</td><td>${details.innerHTML}</td><td>${dlBtnHTML}</td>`;
 
 	return el;
 };
