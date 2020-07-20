@@ -121,11 +121,19 @@ const renderExecution = (exec) => {
 
 	el.classList.add('execution');
 	el.classList.add(exec.verdict === 'OK' ? 'good' : 'bad');
+	if(exec.message != null) el.classList.add('has-message');
 
-	// expand 'CE' text
-	if(exec.verdict === 'CE') exec.verdict = 'Compilation error';
+	// special styling for 'CE' text
+	if(exec.verdict === 'CE') {
+		el.innerText = 'Compilation error';
+		el.setAttribute('title', exec.message);
+	} else {
+		let title = "Test " + exec.test_id;
+		if(exec.message != null) title += ':\n' + exec.message;
+		el.setAttribute('title', title);
+		el.innerText = exec.verdict;
+	}
 
-	el.innerText = exec.verdict;
 	return el;
 };
 

@@ -55,12 +55,31 @@ body {
 	flex-direction: column;
 }
 
+#submit {
+	margin: 0;
+}
+
 #codeinput {
 	margin-top: 1rem;
+	margin-bottom: 1rem;
 	flex-grow: 1;
 	font-family: monospace;
-	font-size: x-small;
 	resize: none;
+}
+
+/* :invalid is active when the textarea is empty */
+#codeinput:invalid {
+	background-image: url("data:image/svg+xml;base64,\
+PHN2ZyB3aWR0aD0iOTYiIGhlaWdodD0iNDgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAw\
+L3N2ZyIgeG1sbnM6c3ZnPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiA8Zz4KICA8dGV4\
+dCB5PSIzNSIgeD0iNDgiIGZpbGw9ImdyYXkiIHN0cm9rZS13aWR0aD0iMCIgZm9udC1zaXplPSIz\
+NiIgZm9udC1mYW1pbHk9Ik1vbm9zcGFjZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgeG1sOnNwYWNl\
+PSJwcmVzZXJ2ZSIgZm9udC13ZWlnaHQ9Im5vcm1hbCIgZm9udC1zdHlsZT0ibm9ybWFsIiBzdHJv\
+a2U9ImdyYXkiPiZsdDsvJmd0OzwvdGV4dD4KIDwvZz4KPC9zdmc+Cg==\
+	");
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center;
 }
 
 /* submission table */
@@ -76,7 +95,28 @@ body {
 	font-family: monospace;
 	font-size: small;
 	display: inline-block;
+	position: relative; /* needed so that message dots are shown properly */
 }
+
+/* executions that have a message */
+.execution.has-message {
+	border-bottom-style: dotted;
+	border-bottom-width: 0.15rem;
+}
+
+/*
+ * Dot after the span - doesn't render well when viewport too small
+.execution.has-message::after {
+	content: "";
+	position: absolute;
+	height: 100%;
+	width: 10px;
+	top: -2px;
+	background-image: radial-gradient(circle at center, red 3px, transparent 3px), radial-gradient(circle at center, red 3px, transparent 3px);
+	background-size: 10px 10px;
+	background-repeat: no-repeat;
+}
+*/
 
 .execution.bad {
 	background-color: #e0e1e2;

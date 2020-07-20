@@ -107,7 +107,18 @@ app.get('/submissions/:subId', (req, res) => {
 				res.json({error: 'database error'});
 				return;
 			}
-			res.json({submissions: submissions, executions: rows});
+
+			// convert buffer with string
+			try {
+				rows = rows.map(x => {
+					if(x.message != null) x.message = x.message.toString();
+					return x;
+				});
+				res.json({submissions: submissions, executions: rows});
+			} catch(err) {
+				logger.warn('Failed to convert buffer to string for execution message (submissions/)', {details: {err: err, user_key: userKey}});
+				res.json({error: 'other error'});
+			}
 		});
 	});
 });
