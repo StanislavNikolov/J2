@@ -22,3 +22,12 @@ Go to http://localhost:8080/admin. Allows connections only from the loopback dev
  * Change which problems are visible
  * See all submissions and change usernames. Don't have any kind of authentication, just a random token allowing you to connect submissions with names. Users changing their browser will have a new token, thus effectivly "registering" again
  * Enable / disable ranking
+
+### TODO
+  * Implement standings with userKey to username mappings
+  * Add "view all submissions" list in admin
+  * Add ladders so that it's easy to configure the judge in "we are practising string problems today" mode
+  * Add "create task" button
+  * Add different score calculation modes, for example: "binary", "codegolf", "memorygolf", "relative"
+  * Implement "download" button in submission list
+  * Test under "windows" - probably different sandboxing method needed
